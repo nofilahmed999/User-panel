@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Using environment variables for security
 const firebaseConfig = {
-apiKey: "AIzaSyBbSEj9d1Sh7qil6QpzsQzeZArtcgNDpvw",
-  authDomain: "authentication-ac3cf.firebaseapp.com",
-  projectId:"authentication-ac3cf",
-  storageBucket: "authentication-ac3cf.firebasestorage.app",
-  messagingSenderId: "22767621913",
-  appId: "web:cc31f3c1bc33f723f3d788",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
