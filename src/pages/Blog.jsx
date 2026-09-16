@@ -23,7 +23,7 @@ export default function Blog() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false); // 🔴 Loading Popup State
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -79,8 +79,10 @@ export default function Blog() {
       let blogsQuery;
 
       if (isAdmin) {
+        // Admin: Saare blogs dekh sakta hai
         blogsQuery = collection(db, "blogs");
       } else {
+        // Normal User: Sirf apne blogs dekh sakta hai
         blogsQuery = query(
           collection(db, "blogs"),
           where("userId", "==", currentUser.uid)
@@ -117,7 +119,13 @@ export default function Blog() {
   // 3. Save / Update Logic
   const handleSaveBlog = async (formData) => {
     if (!currentUser) {
-      toast.error("Please login to create a blog post!");
+      toast.error("Please login first!");
+      return;
+    }
+
+    // 🔴 Restriction: Admin naya blog create nahi kar sakta (Sirf Existing Edit kar sakta hai)
+    if (isAdmin && !editingPost) {
+      toast.error("Admins are not allowed to create new blog posts!");
       return;
     }
 
@@ -126,7 +134,7 @@ export default function Blog() {
     if (formData.file) {
       imageUrl = await uploadImageToCloudinary(formData.file);
       if (!imageUrl) {
-        toast.error("Image upload to Cloudinary failed!");
+        toast.error("Image upload failed!");
         return;
       }
     }
@@ -140,12 +148,14 @@ export default function Blog() {
 
     try {
       if (editingPost) {
+        // Edit Blog (Admin & User both allowed for eligible posts)
         await updateDoc(doc(db, "blogs", editingPost.id), {
           ...payload,
           updatedAt: serverTimestamp(),
         });
         toast.success("Post updated!");
       } else {
+        // Create Blog (Only Normal Users)
         await addDoc(collection(db, "blogs"), {
           ...payload,
           userId: currentUser.uid,
@@ -163,10 +173,10 @@ export default function Blog() {
     }
   };
 
-  // 4. Delete Handler with Loading Popup
+  // 4. Delete Handler
   const handleDeletePost = async (id) => {
     if (window.confirm("Delete this blog post permanently?")) {
-      setIsDeleting(true); // 🔴 Show center popup
+      setIsDeleting(true);
       try {
         await deleteDoc(doc(db, "blogs", id));
         toast.success("Post deleted!");
@@ -175,7 +185,7 @@ export default function Blog() {
         console.error("Delete Error:", err);
         toast.error("Failed to delete!");
       } finally {
-        setIsDeleting(false); // 🔴 Hide popup
+        setIsDeleting(false);
       }
     }
   };
@@ -198,19 +208,22 @@ export default function Blog() {
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Blog Posts</h1>
             <p className="text-slate-500 text-sm mt-1">
-              Community blog entries and updates.
+              {isAdmin ? "Admin View: Manage & moderate all blogs." : "Community blog entries and updates."}
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setEditingPost(null);
-              setIsModalOpen(true);
-            }}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all text-sm"
-          >
-            + Create Blog
-          </button>
+          {/* 🔴 SHOW CREATE BUTTON ONLY TO NORMAL USERS (HIDDEN FOR ADMIN) */}
+          {!isAdmin && (
+            <button
+              onClick={() => {
+                setEditingPost(null);
+                setIsModalOpen(true);
+              }}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all text-sm"
+            >
+              + Create Blog
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -221,9 +234,11 @@ export default function Blog() {
         ) : posts.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300">
             <p className="text-slate-500 font-medium">No blog posts found.</p>
-            <p className="text-slate-400 text-xs mt-1">
-              Click on "+ Create Blog" to write your first post.
-            </p>
+            {!isAdmin && (
+              <p className="text-slate-400 text-xs mt-1">
+                Click on "+ Create Blog" to write your first post.
+              </p>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -323,7 +338,7 @@ export default function Blog() {
         />
       </div>
 
-      {/* 🔴 CENTER POPUP FOR DELETING POST */}
+      {/* CENTER POPUP FOR DELETING POST */}
       {isDeleting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3 border border-slate-100 animate-in fade-in zoom-in duration-200">
