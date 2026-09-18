@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Blog from "./pages/Blog"
-
+import UserProfile from "./pages/UserProfile"; // Naya component import karein
 function App() {
   return (
     <BrowserRouter>
@@ -31,9 +31,9 @@ function App() {
          <Route
           path="/blog"
           element={
-            <ProtectedRoute>
+            
               <Blog />
-            </ProtectedRoute>
+            
           }
         />
        
@@ -46,6 +46,16 @@ function App() {
           }
         />
 
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+          
         {/* Protected Admin Only Route */}
         <Route
           path="/admin/user/:id"

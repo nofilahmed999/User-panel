@@ -60,17 +60,20 @@ const Navbar = () => {
           {!isAdmin && (
             <>
               {/* Route + Hash ID setup for sections in Home.jsx */}
-              <Link to="/home#hero" className="hover:text-white transition-colors">
+              <Link
+                to="/home#hero"
+                className="hover:text-white transition-colors"
+              >
                 Home
               </Link>
 
               <Link to="/blog" className="hover:text-white transition-colors">
                 Blog
               </Link>
-
-              <Link to="/home#contact" className="hover:text-white transition-colors">
-                Contact
+             <Link to="/profile" className="hover:text-white transition-colors">
+                Profile
               </Link>
+             
             </>
           )}
 
@@ -84,10 +87,7 @@ const Navbar = () => {
               </Link>
 
               {/* 🔴 ADMIN BLOG LINK ADDED */}
-              <Link
-                to="/blog"
-                className="hover:text-white transition-colors"
-              >
+              <Link to="/blog" className="hover:text-white transition-colors">
                 Blog
               </Link>
             </>
@@ -158,12 +158,8 @@ const Navbar = () => {
               Blog
             </Link>
 
-            <Link
-              to="/home#contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block py-2"
-            >
-              Contact
+            <Link to="/profile" className="text-slate-600 hover:text-blue-600">
+              Profile
             </Link>
           </>
         )}
